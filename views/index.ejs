@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hive Frontend Builder</title>
+</head>
+<body>
+    <h1>Welcome to the Hive Frontend Builder</h1>
+    <p>This is a simple EJS template.</p>
+
+    <!-- Include HTMX -->
+    <script src="https://unpkg.com/htmx.org"></script>
+
+    <!-- Dynamic Content Trigger -->
+    <h2 hx-get="/dynamic-content" hx-trigger="click" hx-target="#dynamic-content" style="cursor: pointer;">Click me for dynamic content</h2>
+    <div id="dynamic-content"></div>
+
+</body>
+</html>

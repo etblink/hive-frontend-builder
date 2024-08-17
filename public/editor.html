@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hive Frontend Builder</title>
+    <link href="https://unpkg.com/grapesjs/dist/css/grapes.min.css" rel="stylesheet"/>
+</head>
+<body>
+    <div id="gjs"></div>
+
+    <script src="https://unpkg.com/grapesjs"></script>
+    <script>
+        const editor = grapesjs.init({
+            container: '#gjs',
+            fromElement: true,
+            width: 'auto',
+            storageManager: false,
+            panels: { defaults: [] },
+            blockManager: {
+                appendTo: '#blocks',
+                blocks: [
+                    // Define custom blocks here
+                ]
+            },
+        });
+    </script>
+</body>
+</html>
