@@ -31,7 +31,7 @@
         <h1>Hello World Component!</h1>
     </div>
     <div id="blocks"></div>      
-
+    <script src="https://unpkg.com/htmx.org"></script>
     <script src="https://unpkg.com/grapesjs"></script>
     <script>
         const editor = grapesjs.init({
@@ -51,11 +51,13 @@
                             <h1>This is a simple title</h1>
                             <div>This is just a Lorem text: Lorem ipsum dolor sit amet</div>
                           </section>`,
+                category: 'Basic'
             },
             {
                 id: 'text',
                 label: 'Text',
                 content: '<div data-gjs-type="text">Insert your text here</div>',
+                category: 'Basic'
             },
             {
                 id: 'image',
@@ -63,48 +65,58 @@
                 select: true,
                 content: { type: 'image' },
                 activate: true,
-            },
-        ]
-    },
-    panels: {
-        defaults: [
-            {
-                id: 'panel-top',
-                el: '.panel__top',
+                category: 'Basic'
             },
             {
-                id: 'basic-actions',
-                el: '.panel__basic-actions',
-                buttons: [
-                    {
-                        id: 'visibility',
-                        active: true,
-                        className: 'btn-toggle-borders',
-                        label: '<u>B</u>',
-                        command: 'sw-visibility',
-                    },
-                    {
-                        id: 'export',
-                        className: 'btn-open-export',
-                        label: 'Exp',
-                        command: 'export-template',
-                        context: 'export-template',
-                    },
-                    {
-                        id: 'show-json',
-                        className: 'btn-show-json',
-                        label: 'JSON',
-                        context: 'show-json',
-                        command(editor) {
-                            editor.Modal.setTitle('Components JSON')
-                                .setContent(`<textarea style="width:100%; height: 250px;">${JSON.stringify(editor.getComponents())}</textarea>`)
-                                .open();
-                        },
-                    }
-                ],
-            }
+                id: 'htmx-dynamic-content',
+                label: 'HTMX Dynamic Content',
+                content: `
+                    <h2 hx-get="/dynamic-content" hx-trigger="click" hx-target="#dynamic-content" style="cursor: pointer;">
+                        Click me for dynamic content
+                    </h2>
+                    <div id="dynamic-content"></div>
+                `,
+                category: 'Dynamic',
+                attributes: { class:'gjs-fonts gjs-f-dynamic' },
+            },
         ]
-    },
+    }
+});
+
+editor.Panels.addPanel({
+  id: 'panel-top',
+  el: '.panel__top',
+});
+editor.Panels.addPanel({
+  id: 'basic-actions',
+  el: '.panel__basic-actions',
+  buttons: [
+    {
+      id: 'visibility',
+      active: true, // active by default
+      className: 'btn-toggle-borders',
+      label: '<u>B</u>',
+      command: 'sw-visibility', // Built-in command
+    }, {
+      id: 'export',
+      className: 'btn-open-export',
+      label: 'Exp',
+      command: 'export-template',
+      context: 'export-template', // For grouping context of buttons from the same panel
+    }, {
+      id: 'show-json',
+      className: 'btn-show-json',
+      label: 'JSON',
+      context: 'show-json',
+      command(editor) {
+        editor.Modal.setTitle('Components JSON')
+          .setContent(`<textarea style="width:100%; height: 250px;">
+            ${JSON.stringify(editor.getComponents())}
+          </textarea>`)
+          .open();
+      },
+    }
+  ],
 });
 
     </script>
