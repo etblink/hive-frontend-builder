@@ -58,3 +58,6 @@ test-results/
 
 # Ignore database files
 *.db
+
+#Replit
+*.replit
