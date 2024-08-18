@@ -1,138 +1,75 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GrapesJS Text Block</title>
-    <link href="https://unpkg.com/grapesjs/dist/css/grapes.min.css" rel="stylesheet"/>
+  <head>
+    <!-- ... -->
+    <script src="https://unpkg.com/@grapesjs/studio-sdk/dist/index.umd.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/@grapesjs/studio-sdk/dist/style.css"/>
     <link rel="stylesheet" href="style.css">
-    <style>
-        body, html {
-            height: 100%;
-            margin: 0;
-        }
-        #gjs {
-            height: 100%;
-            box-sizing: border-box;
-        }
-        .panel__top {
-            padding: 0;
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-        }
-        .panel__basic-actions {
-            position: initial;
-        }
-    </style>
-    
-</head>
-<body>
+  </head>
+  <body>
     <div id="ibal" class="navbar">
-        <div data-gjs="navbar" id="iyfg" class="navbar-container">
-          <div id="i4k1" class="navbar-burger">
-            <div id="i7oxu" class="navbar-burger-line"></div>
-            <div id="iml4s" class="navbar-burger-line"></div>
-            <div id="i2wal" class="navbar-burger-line"></div>
-          </div>
-          <div data-gjs="navbar-items" class="navbar-items-c">
-            <nav id="ini0f" class="navbar-menu"><a href="/" id="iea3u" class="navbar-menu-link">Home</a><a
-                href="/editor.html" id="iryd3" class="navbar-menu-link">Editor</a></nav>
-          </div>
+      <div data-gjs="navbar" id="iyfg" class="navbar-container">
+        <div id="i4k1" class="navbar-burger">
+          <div id="i7oxu" class="navbar-burger-line"></div>
+          <div id="iml4s" class="navbar-burger-line"></div>
+          <div id="i2wal" class="navbar-burger-line"></div>
+        </div>
+        <div data-gjs="navbar-items" class="navbar-items-c">
+          <nav id="ini0f" class="navbar-menu"><a href="/" id="iea3u" class="navbar-menu-link">Home</a><a
+              href="/editor.html" id="iryd3" class="navbar-menu-link">Editor</a></nav>
         </div>
       </div>
-    <div id="gjs">
-        <h1>Hello World Component!</h1>
     </div>
-    <div id="blocks"></div>      
-    <script src="https://unpkg.com/htmx.org"></script>
-    <script src="https://unpkg.com/grapesjs"></script>
+    <div id="studio-editor"></div>
     <script>
-        const editor = grapesjs.init({
-    container: '#gjs',
-    fromElement: true,
-    height: '100%',
-    width: 'auto',
-    storageManager: false,
-    blockManager: {
-        appendTo: '#blocks',
-        blocks: [
-            {
-                id: 'section',
-                label: '<b>Section</b>',
-                attributes: { class: 'gjs-block-section' },
-                content: `<section>
-                            <h1>This is a simple title</h1>
-                            <div>This is just a Lorem text: Lorem ipsum dolor sit amet</div>
-                          </section>`,
-                category: 'Basic'
-            },
-            {
-                id: 'text',
-                label: 'Text',
-                content: '<div data-gjs-type="text">Insert your text here</div>',
-                category: 'Basic'
-            },
-            {
-                id: 'image',
-                label: 'Image',
-                select: true,
-                content: { type: 'image' },
-                activate: true,
-                category: 'Basic'
-            },
-            {
-                id: 'htmx-dynamic-content',
-                label: 'HTMX Dynamic Content',
-                content: `
-                    <h2 hx-get="/dynamic-content" hx-trigger="click" hx-target="#dynamic-content" style="cursor: pointer;">
-                        Click me for dynamic content
-                    </h2>
-                    <div id="dynamic-content"></div>
-                `,
-                category: 'Dynamic',
-                attributes: { class:'gjs-fonts gjs-f-dynamic' },
-            },
-        ]
-    }
-});
-
-editor.Panels.addPanel({
-  id: 'panel-top',
-  el: '.panel__top',
-});
-editor.Panels.addPanel({
-  id: 'basic-actions',
-  el: '.panel__basic-actions',
-  buttons: [
-    {
-      id: 'visibility',
-      active: true, // active by default
-      className: 'btn-toggle-borders',
-      label: '<u>B</u>',
-      command: 'sw-visibility', // Built-in command
-    }, {
-      id: 'export',
-      className: 'btn-open-export',
-      label: 'Exp',
-      command: 'export-template',
-      context: 'export-template', // For grouping context of buttons from the same panel
-    }, {
-      id: 'show-json',
-      className: 'btn-show-json',
-      label: 'JSON',
-      context: 'show-json',
-      command(editor) {
-        editor.Modal.setTitle('Components JSON')
-          .setContent(`<textarea style="width:100%; height: 250px;">
-            ${JSON.stringify(editor.getComponents())}
-          </textarea>`)
-          .open();
-      },
-    }
-  ],
-});
-
+      GrapesJsStudioSDK.createStudioEditor({
+        root: '#studio-editor',
+        licenseKey: 'Enter-GrapeJS-Studio-Public-Key',  //should still work on localhost without it
+        assets: {
+          // Provide a custom upload handler for assets
+          onUpload: async ({ files }) => {
+            const body = new FormData();
+            for (const file of files) {
+              body.append('files', file);
+            }
+            const response = await fetch('ASSETS_UPLOAD_URL', { method: 'POST', body });
+            const result = await response.json();
+            // The expected result should be an array of assets, eg.
+            // [{ src: 'ASSET_URL' }]
+            return result;
+          },
+          // Provide a custom handler for loading project assets
+          onLoad: async () => {
+            // Load assets from your server
+            const response = await fetch('ASSETS_LOAD_URL');
+            const result = await response.json();
+            // you can also provide default assets here
+            return [ { src: 'ASSET_URL' }, ...result ];
+          },
+          // Provide a custom handler for deleting assets
+          onDelete: async ({ assets }) => {
+            const body = JSON.stringify(assets);
+            await fetch('ASSETS_DELETE_URL', { method: 'DELETE', body });
+          }
+        },
+        storage: {
+          // Provide a custom handler for saving the project data.
+          onSave: async ({ project }) => {
+            const body = new FormData();
+            body.append('project', JSON.stringify(project));
+            await fetch('PROJECT_SAVE_URL', { method: 'POST', body });
+          },
+          // Provide a custom handler for loading project data.
+          onLoad: async () => {
+            const response = await fetch('PROJECT_LOAD_URL');
+            const project = await response.json();
+            // The project JSON is expected to be returned inside an object.
+            return { project };
+          },
+          autosaveChanges: 100,
+          autosaveIntervalMs: 10000
+        }
+      });
     </script>
-</body>
-</html>
+  </body>
+<html>
